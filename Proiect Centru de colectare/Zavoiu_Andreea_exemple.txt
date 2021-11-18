@@ -1,0 +1,121 @@
+        -- Cerinta 11
+-- 1. Mesajul "ok"/"not ok" daca dispozitivele inteligente din Craiova si Bacau
+-- au fost instalate in anul 2017 si numarul de saptamani care au trecut de la 
+-- instalarea lor.
+select distinct cdg.id_cos, decode(to_char(data_instalarii, 'YYYY'), '2017', 'ok', 'not ok') instalare,
+         round((trunc(sysdate)-trunc(data_instalarii))/7) saptamani
+from cosuri_de_gunoi cdg
+where (lower(cdg.oras)='craiova' or upper(cdg.oras)='BACAU')
+order by cdg.id_cos;
+
+
+
+-- 2. Sa se afiseze salariile maxime pt fiecare centru, mai mari decat salariul maxim 
+-- din centrul care detine dispozitivul cu id-ul 1, daca capacitatea cosului care ii
+-- corespunde este mai mare de 2 kg.
+SELECT a.id_centru, max(salariu) "Salariul maxim"
+FROM angajati a
+GROUP BY a.id_centru
+HAVING max(salariu)>
+                (SELECT max(salariu)    -- subcerere nesincronizata
+                 FROM angajati a
+                 join centre_de_colectare cdc on cdc.id_centru = a.id_centru
+                 join dispozitive_inteligente di on cdc.id_centru = di.id_centru
+                 full join cosuri_de_gunoi cdg on cdg.id_cos = di.id_cos
+                 WHERE di.id_dispozitiv = 1 and cdc.capacitate > 2);
+                 
+                 
+-- 3. Sa se clasifice castigurile angajatilor, inclusiv pentru cei care nu sunt soferi si sa se mai 
+-- afiseze numele, tipul permisului si fabrica vehiculelor pentru toti angajatii si toate vehiculele.
+select a.nume,
+    case when a.salariu > 3000 then 'high'
+         when a.salariu > 2000 then 'average'
+         else 'low' end salariu,
+    tip_permis "sunt angajatii soferi sau nu?", fabrica "au vehiculele soferi sau nu?"
+from angajati a
+left outer join soferi s on a.id_angajat = s.id_sofer -- leg angajatii de vehicule prin intermediul soferilor
+left outer join sofer_vehicul sv on sv.id_sofer = s.id_sofer
+-- vreau sa-mi apara si soferii care nu au vehicul asignat
+full outer join vehicule v on v.numar_vehicul = sv.numar_vehicul ;
+
+
+-- 4. Sa se afiseze orasul si id-ul cosurilor pentru care capacitatea este mai mare decat
+-- capacitatea medie a tuturor cosurilor de gunoi.
+with avg_cap as (
+    select avg(capacitate)
+    from cosuri_de_gunoi)
+select id_cos, oras
+from cosuri_de_gunoi
+where (select * from avg_cap) < capacitate;
+
+
+-- 5. Sa se afiseze centrul, numele si adresa angajatilor care sunt soferi si stau in
+-- unul din orasele in care se afla si un centru de colectare
+select id_centru, nume, adresa 
+from angajati a
+where id_centru in 
+        (select id_centru
+         from soferi
+         where nume = a.nume and adresa in (select locatie
+                                            from centre_de_colectare))
+order by id_centru;
+
+
+--------------------------------------------------------------------------------------
+       -- Cerinta 12
+-- Stergerea locatiilor din judetele care incep cu litera a
+delete from locatii
+where lower(judet) like 'a%';
+
+-- Marirea salariului tuturor angajatilor din tabelul ANGAJATI cu 5%:
+update angajati
+set salary = salary * 0.05;
+commit;
+
+-- Sa se stearga datele din tabelul SOFERI.
+delete from soferi;
+
+
+--------------------------------------------------------------------------------------
+       -- Cerinta 14
+       
+create or replace view employee as
+    (select a.id_angajat, a.id_centru, nume, telefon, capacitate
+    from angajati a
+    join centre_de_colectare cdc on a.id_centru = cdc.id_centru
+    where lower(locatie) = 'bucuresti');
+
+-- permisa:
+insert into employee (id_angajat, id_centru, nume, telefon) values (8, 2, 'Maria', 0799993333) ;
+-- nepermisa:
+insert into employee (capacitate) values (18);
+commit;
+
+
+--------------------------------------------------------------------------------------
+       -- Cerinta 15
+ 
+-- Se cer id-ul si orasul cosurilor de gunoi.      
+create index cautare_cos on cosuri_de_gunoi (id_cos, oras);
+
+
+--------------------------------------------------------------------------------------
+       -- Cerinta 16
+        
+-- Sa se afiseze id-ul centrelor care nu au inca niciun angajat. 
+select *
+from centre_de_colectare cdc
+where not exists (select 1
+                  from angajati a
+                  where cdc.id_centru = a.id_centru);
+
+
+
+-- Sa se afiseze furnizorii al caror nume incepe cu litera c dar nu sunt cosuri de gunoi.
+select id_furnizor, nume
+from furnizori
+where lower(nume) like 'c%'
+minus
+select id_furnizor, nume
+from furnizori
+where lower(nume) like '%cos de gunoi%';

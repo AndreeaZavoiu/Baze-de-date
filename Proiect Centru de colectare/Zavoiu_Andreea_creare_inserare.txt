@@ -1,0 +1,277 @@
+CREATE TABLE cosuri_de_gunoi(
+                            id_cos number(4) PRIMARY KEY,       -- coincide cu id_furnizor
+                            id_dispozitiv number(4) NOT NULL,
+                            capacitate number(4) NOT NULL,
+                            oras varchar2(20) NOT NULL,
+                            data_instalarii date,
+                            nume varchar2(20) NOT NULL,
+                            id_centru number(4));
+                            
+-- subentitatea cosuri_de_gunoi ia toate atributele superentitatii furnizori                            
+alter table cosuri_de_gunoi add (nume varchar2(20)); 
+alter table cosuri_de_gunoi add (id_centru number(4));                          
+    
+INSERT INTO cosuri_de_gunoi (id_cos, capacitate, id_dispozitiv, oras, data_instalarii, nume, id_centru) VALUES (1, 7,  1, 'Ploiesti',  to_date('02-FEB-14'), 'Cos de gunoi', 3);
+INSERT INTO cosuri_de_gunoi (id_cos, capacitate, id_dispozitiv, oras, data_instalarii, nume, id_centru) VALUES (2, 3,  2, 'Bacau',     to_date('23-SEP-17'), 'Cos de gunoi', 4);
+INSERT INTO cosuri_de_gunoi (id_cos, capacitate, id_dispozitiv, oras, data_instalarii, nume, id_centru) VALUES (3, 5,  3, 'Sibiu',     to_date('12-MAR-15'), 'Cos de gunoi', 5);
+INSERT INTO cosuri_de_gunoi (id_cos, capacitate, id_dispozitiv, oras, data_instalarii, nume, id_centru) VALUES (4, 10, 4, 'Bucuresti', to_date('08-FEB-14'), 'Cos de gunoi', 2);
+INSERT INTO cosuri_de_gunoi (id_cos, capacitate, id_dispozitiv, oras, data_instalarii, nume, id_centru) VALUES (5, 1,  5, 'Craiova',   to_date('28-FEB-17'), 'Cos de gunoi', 1);
+
+---------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE locatii(
+                    id_cos number(4) NOT NULL,
+                    longitudine varchar2(20) NOT NULL,
+                    latitudine varchar2(20) NOT NULL,
+                    oras varchar2(20) NOT NULL,
+                    judet varchar2(20) NOT NULL,
+                    constraint loc_loc_pk unique (id_cos, longitudine, latitudine));
+                    
+INSERT INTO locatii (id_cos, longitudine, latitudine, oras, judet) VALUES (1, '26.03', '44.94', 'Ploiesti', 'Prahova');  
+INSERT INTO locatii (id_cos, longitudine, latitudine, oras, judet) VALUES (2, '26.89', '46.57', 'Bacau', 'Bacau');  
+INSERT INTO locatii (id_cos, longitudine, latitudine, oras, judet) VALUES (3, '24.16', '45.78', 'Sibiu', 'Sibiu');  
+INSERT INTO locatii (id_cos, longitudine, latitudine, oras, judet) VALUES (4, '26.08', '44.48', 'Bucuresti', 'Bucuresti');  
+INSERT INTO locatii (id_cos, longitudine, latitudine, oras, judet) VALUES (5, '23.85', '44.31', 'Craiova', 'Dolj');  
+
+----------------------------------------------------------------------------------------------------------------------------------------     
+CREATE TABLE centre_de_colectare (
+                                id_centru number(4) PRIMARY KEY,
+                                capacitate number(4) NOT NULL,
+                                locatie varchar2(100) NOT NULL);
+                                
+alter table centre_de_colectare add (id_angajat number(4));                               
+alter table centre_de_colectare add constraint centru_ang_fk foreign key(id_angajat) references angajati(id_angajat) on delete set null;
+alter table centre_de_colectare add (numar_vehicul varchar2(20));                               
+alter table centre_de_colectare add constraint centru_veh_fk foreign key(numar_vehicul) references vehicule(numar_vehicul) on delete set null;
+-- update centre_de_colectare set id_angajat             
+                                    
+INSERT INTO centre_de_colectare (id_centru, capacitate, locatie) VALUES (1, 14, 'Craiova');
+INSERT INTO centre_de_colectare (id_centru, capacitate, locatie) VALUES (2, 45, 'Bucuresti');
+INSERT INTO centre_de_colectare (id_centru, capacitate, locatie) VALUES (3, 33, 'Ploiesti');
+INSERT INTO centre_de_colectare (id_centru, capacitate, locatie) VALUES (4, 17, 'Bacau');
+INSERT INTO centre_de_colectare (id_centru, capacitate, locatie) VALUES (5, 25, 'Sibiu');    
+INSERT INTO centre_de_colectare (id_centru, capacitate, locatie) VALUES (6, 30, 'Timisoara');    
+    
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE furnizori(
+                    id_furnizor number(4) PRIMARY KEY,
+                    nume varchar2(20) NOT NULL,
+                    id_centru number(4),
+                    constraint furnizori_centru_fk foreign key (id_centru)
+                    references centre_de_colectare(id_centru)
+                    on delete set null);
+
+INSERT INTO furnizori (id_furnizor, nume, id_centru) VALUES (1, 'Cos de gunoi', 3);
+INSERT INTO furnizori (id_furnizor, nume, id_centru) VALUES (2, 'Cos de gunoi', 4);
+INSERT INTO furnizori (id_furnizor, nume, id_centru) VALUES (3, 'Cos de gunoi', 5);
+INSERT INTO furnizori (id_furnizor, nume, id_centru) VALUES (4, 'Cos de gunoi', 2);
+INSERT INTO furnizori (id_furnizor, nume, id_centru) VALUES (5, 'Cos de gunoi', 1);
+INSERT INTO furnizori (id_furnizor, nume, id_centru) VALUES (6, 'Carrefour Blejoi', 3);
+INSERT INTO furnizori (id_furnizor, nume, id_centru) VALUES (7, 'Parc Herastrau', 2);
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE categorii_deseuri(
+                            id_categorie number(4) PRIMARY KEY,
+                            nume varchar2(20) NOT NULL,
+                            culoare varchar2(20),
+                            cantitate number(4) NOT NULL,
+                            data_livrarii date);
+
+INSERT INTO categorii_deseuri (id_categorie, nume, culoare, cantitate, data_livrarii) VALUES (1, 'Plastic',          'Galben',   8,  to_date('23-FEB-17'));
+INSERT INTO categorii_deseuri (id_categorie, nume, culoare, cantitate, data_livrarii) VALUES (2, 'Hartie',           'Albastru', 5,  to_date('03-MAR-17'));
+INSERT INTO categorii_deseuri (id_categorie, nume, culoare, cantitate, data_livrarii) VALUES (3, 'Deseuri menajere', 'Maro',     20, to_date('29-SEP-16'));
+INSERT INTO categorii_deseuri (id_categorie, nume, culoare, cantitate, data_livrarii) VALUES (4, 'Sticla',           'Verde',    16, to_date('12-FEB-14'));
+INSERT INTO categorii_deseuri (id_categorie, nume, culoare, cantitate, data_livrarii) VALUES (5, 'Metal',            'Rosu',     11, to_date('08-OCT-16'));
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE centru_categorie (
+                            id_centru number(4) NOT NULL,
+                            id_categorie number(4) NOT NULL,
+                            nr_echipamente number(4), 
+                            constraint cc_cc_pk unique(id_centru, id_categorie));
+
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (1, 1, 4);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (2, 5, 7);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (5, 3, 1);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (4, 5, 9);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (1, 2, 5);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (3, 2, 4);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (3, 4, 11);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (4, 1, 3);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (2, 3, 6);
+INSERT INTO centru_categorie (id_centru, id_categorie, nr_echipamente) VALUES (5, 4, 2);
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE clienti (
+                    id_client number(4) PRIMARY KEY,
+                    nume varchar2(20) NOT NULL,
+                    specializare varchar2(100) NOT NULL,
+                    telefon number(10) NOT NULL,
+                    adresa varchar2(100) NOT NULL );
+
+INSERT INTO clienti (id_client, nume, specializare, telefon, adresa) VALUES (1, 'Pacos Eco',    'Plastic, Metal',            0709882991, 'Bacau');
+INSERT INTO clienti (id_client, nume, specializare, telefon, adresa) VALUES (2, 'Remat PH',     'Metal, Sticla',             0299782911, 'Bucuresti');
+INSERT INTO clienti (id_client, nume, specializare, telefon, adresa) VALUES (3, 'Stilos Com',   'Sticla, Metal, Hartie',     0791188551, 'Blejoi');
+INSERT INTO clienti (id_client, nume, specializare, telefon, adresa) VALUES (4, 'Intercom TT',  'Deseuri menajere, Plastic', 0779783921, 'Sibiu');
+INSERT INTO clienti (id_client, nume, specializare, telefon, adresa) VALUES (5, 'Nevo SRL',     'Hartie, Metal',             0229282929, 'Craiova');
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE client_categorie (
+                            id_client number(4) NOT NULL,
+                            id_categorie number(4) NOT NULL,
+                            observatii varchar2(20),
+                            constraint clc_clc_pk unique(id_client, id_categorie));
+                        
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (1, 1, 'plastic');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (4, 1, 'plastic'); 
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (3, 2, 'hartie');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (5, 2, 'hartie');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (4, 3, 'deseuri mesajere');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (2, 4, 'sticla');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (3, 4, 'sticla');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (1, 5, 'metal');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (2, 5, 'metal');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (3, 5, 'metal');
+INSERT INTO client_categorie (id_client, id_categorie, observatii) VALUES (5, 5, 'metal');
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE dispozitive_inteligente(
+                                id_dispozitiv number(4) PRIMARY KEY,
+                                id_cos number(4),
+                                locatie varchar2(100),
+                                id_centru number(4),
+                                constraint disp_cos_fk foreign key (id_cos)
+                                references cosuri_de_gunoi(id_cos)
+                                on delete set null,
+                                constraint disp_centru_fk foreign key (id_centru)
+                                references centre_de_colectare(id_centru)
+                                on delete set null);
+
+INSERT INTO dispozitive_inteligente (id_dispozitiv, id_cos, locatie, id_centru) VALUES (1, 5, 'Craiova',   1);
+INSERT INTO dispozitive_inteligente (id_dispozitiv, id_cos, locatie, id_centru) VALUES (2, 2, 'Bacau',     4);
+INSERT INTO dispozitive_inteligente (id_dispozitiv, id_cos, locatie, id_centru) VALUES (3, 1, 'Ploiesti',  3);
+INSERT INTO dispozitive_inteligente (id_dispozitiv, id_cos, locatie, id_centru) VALUES (4, 3, 'Sibiu',     5);
+INSERT INTO dispozitive_inteligente (id_dispozitiv, id_cos, locatie, id_centru) VALUES (5, 4, 'Bucuresti', 2);
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE angajati(
+                    id_angajat number(4) PRIMARY KEY,
+                    nume varchar2(20) NOT NULL,
+                    salariu number(10),
+                    telefon number(10) NOT NULL,
+                    adresa varchar2(100),
+                    id_centru number(4) NOT NULL,
+                    constraint ang_centru_fk foreign key (id_centru)
+                    references centre_de_colectare(id_centru)
+                    on delete set null);
+
+INSERT INTO angajati (id_angajat, nume, salariu, telefon, adresa, id_centru) VALUES (1, 'Popescu Andrei', 2500, 0712479287, 'Ploiesti',  3);
+INSERT INTO angajati (id_angajat, nume, salariu, telefon, adresa, id_centru) VALUES (2, 'Ionescu Stefan', 1800, 0723579286, 'Bucuresti', 2);
+INSERT INTO angajati (id_angajat, nume, salariu, telefon, adresa, id_centru) VALUES (3, 'Stan Victor',    2570, 0702742881, 'Sibiu',     5);
+INSERT INTO angajati (id_angajat, nume, salariu, telefon, adresa, id_centru) VALUES (4, 'Radu Aiana',     1500, 0777679222, 'Craiova',   1);
+INSERT INTO angajati (id_angajat, nume, salariu, telefon, adresa, id_centru) VALUES (5, 'Albu Maria',     3200, 0788499350, 'Bacau',     4);
+INSERT INTO angajati (id_angajat, nume, salariu, telefon, adresa, id_centru) VALUES (6, 'Gheorghe Ana',   5000, 072494555,  'Bucuresti', 2);
+INSERT INTO angajati (id_angajat, nume, salariu, telefon, adresa, id_centru) VALUES (7, 'Visan Robert',   2200, 0798699324, 'Ploiesti',  3);
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE soferi(
+                    id_sofer number(4) PRIMARY KEY, -- coincide cu id_angajat
+                    tip_permis varchar2(20),
+                    nume varchar2(20) NOT NULL,
+                    salariu number(10),
+                    telefon number(10),
+                    adresa varchar2(100),
+                    id_centru number(4) NOT NULL,
+                    constraint soferi_centru_fk foreign key (id_centru)
+                    references centre_de_colectare(id_centru)
+                    on delete set null);
+
+INSERT INTO soferi (id_sofer, tip_permis, nume, salariu, telefon, adresa, id_centru) VALUES (1, 'B',  'Popescu Andrei', 2500, 0712479287, 'Ploiesti',  3);  -- autovehicul tragator(<3500kg) + remorca(<750kg)
+INSERT INTO soferi (id_sofer, tip_permis, nume, salariu, telefon, adresa, id_centru) VALUES (2, 'D',  'Ionescu Stefan', 1800, 0723579286, 'Bucuresti', 2);  -- transport persoane
+INSERT INTO soferi (id_sofer, tip_permis, nume, salariu, telefon, adresa, id_centru) VALUES (3, 'DE', 'Stan Victor',    2570, 0702742881, 'Sibiu',     5); -- autovehicul tragator + remorca(>750kg)
+INSERT INTO soferi (id_sofer, tip_permis, nume, salariu, telefon, adresa, id_centru) VALUES (4, 'Tr', 'Radu Aiana',     1500, 0777679222, 'Craiova',   1); -- tractoare agricole/forestiere
+INSERT INTO soferi (id_sofer, tip_permis, nume, salariu, telefon, adresa, id_centru) VALUES (5, 'CE', 'Albu Maria',     3200, 0788499350, 'Bacau',     4); -- autovehicul tragator(>3500kg) + (semi)remorca (>750kg)
+INSERT INTO soferi (id_sofer, tip_permis, nume, salariu, telefon, adresa, id_centru) VALUES (6, 'B', 'No Vehicul S',   3200, 0788499350,  'Bucuresti', 3);
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE vehicule(
+                    numar_vehicul varchar2(20) PRIMARY KEY,
+                    tip varchar2(20),
+                    fabrica varchar2(20),
+                    id_centru number(4) NOT NULL,
+                    constraint veh_centru_fk foreign key (id_centru)
+                    references centre_de_colectare(id_centru)
+                    on delete set null);
+
+INSERT INTO vehicule (numar_vehicul, tip, fabrica, id_centru) VALUES ('PH 76 ABC', 'Gunoiera',     'Renault',    3);
+INSERT INTO vehicule (numar_vehicul, tip, fabrica, id_centru) VALUES ('B 336 NNC', 'Camion',       'Volkswagen', 2);
+INSERT INTO vehicule (numar_vehicul, tip, fabrica, id_centru) VALUES ('SB 12 KQM', 'Gunoiera',     'Ford',       5);
+INSERT INTO vehicule (numar_vehicul, tip, fabrica, id_centru) VALUES ('DJ 94 ABB', 'Autogunoiera', 'Norba',      1);
+INSERT INTO vehicule (numar_vehicul, tip, fabrica, id_centru) VALUES ('BC 33 STI', 'Camion',       'Ford',       4);
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE sofer_vehicul(
+                            id_sofer number(4) NOT NULL, 
+                            numar_vehicul varchar2(20) NOT NULL,
+                            observatii varchar2(20),
+                            constraint sof_veh_pk unique(id_sofer, numar_vehicul));
+
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (4, 'DJ 94 ABB', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (1, 'PH 76 ABC', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (2, 'B 336 NNC', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (3, 'SB 12 KQM', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (5, 'B 336 NNC', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (5, 'BC 33 STI', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (1, 'B 336 NNC', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (4, 'B 336 NNC', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (1, 'BC 33 STI', '');
+INSERT INTO sofer_vehicul (id_sofer, numar_vehicul, observatii) VALUES (2, 'PH 76 ABC', '');
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE vehicul_cos (
+                        id_cos number(4) NOT NULL, 
+                        numar_vehicul varchar2(20) NOT NULL,
+                        observatii varchar2(20),
+                        constraint veh_cos_pk unique (id_cos, numar_vehicul));
+
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (1, 'PH 76 ABC', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (2, 'BC 33 STI', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (3, 'SB 12 KQM', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (4, 'B 336 NNC', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (5, 'DJ 94 ABB', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (1, 'B 336 NNC', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (4, 'PH 76 ABC', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (5, 'B 336 NNC', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (3, 'PH 76 ABC', '');
+INSERT INTO vehicul_cos (id_cos, numar_vehicul, observatii) VALUES (1, 'BC 33 STI', '');
+
+----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE utilizatori(
+                        id_utilizator number(4) PRIMARY KEY,
+                        telefon number(10),
+                        adresa varchar2(100));
+
+CREATE SEQUENCE s INCREMENT BY 1 START WITH 1;  
+INSERT INTO utilizatori (id_utilizator, telefon, adresa) VALUES (s.nextval, 0733195500, 'Bacau Str. Democratiei');
+INSERT INTO utilizatori (id_utilizator, telefon, adresa) VALUES (s.nextval, 0788499350, 'Baicoi Str. Mihai Eminescu');
+INSERT INTO utilizatori (id_utilizator, telefon, adresa) VALUES (s.nextval, 0701239973, 'Sibiu Str. Cernei');
+INSERT INTO utilizatori (id_utilizator, telefon, adresa) VALUES (s.nextval, 0722451306, 'Bucuresti Bd Independentei');
+INSERT INTO utilizatori (id_utilizator, telefon, adresa) VALUES (s.nextval, 0714136909, 'Craiova Str. Zorilor');
+
+---------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE utilizator_cos(
+                            id_cos number(4) NOT NULL, 
+                            id_utilizator number(4) NOT NULL,
+                            observatii varchar2(100),
+                            constraint utiliz_cos_pk unique(id_cos, id_utilizator));
+                          
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (1, 2, 'Ploiesti-Baicoi');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (1, 4, 'Ploiesti-Bucuresti');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (1, 1, 'Ploiesti-Bacau');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (2, 1, 'Bacau-Bacau');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (2, 2, 'Bacau-Baicoi');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (3, 3, 'Sibiu-Sibiu');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (3, 4, 'Sibiu-Bucuresti');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (4, 5, 'Bucuresti-Craiova');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (4, 4, 'Bucuresti-Bucuresti');
+INSERT INTO utilizator_cos (id_cos, id_utilizator, observatii) VALUES (5, 5, 'Craiova-Craiova');
+
