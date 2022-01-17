@@ -1,3 +1,4 @@
 # Baze-de-date
 
-Anul 1, Sem 2
+BD: Anul 1, Sem 2
+SGBD: Anul 2, Sem 1
