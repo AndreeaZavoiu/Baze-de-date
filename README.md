@@ -1,11 +1,12 @@
 # Baze-de-date
 
 BD: Anul 1, Sem 2
+
 SGBD: Anul 2, Sem 1
 
 
 
-Proiect - FMI, Unibuc, SGBD, Anul 2, Semestrul 1 
+Proiect - FMI, Unibuc, SGBD, Anul 2, Semestrul 1 :
 
 Am creat conexiunea la baza de date cu ajutorul platformei Oracle Cloud (https://idcs-ac99522eb5dc48668d1054ab9b09cafc.identity.oraclecloud.com/ui/v1/signin), unde mi-am creat cont folosind adresa institutionala. Am conceput baza de date autonoma:
 
