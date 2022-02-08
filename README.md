@@ -13,6 +13,8 @@ Am creat conexiunea la baza de date cu ajutorul platformei Oracle Cloud (https:/
 <br/>:arrow_right: Create administrator credentials -> Username: admin, parola care va fi folosita la realizarea conexiunii;
 <br/>:arrow_right: Secure access from everywhere;
 <br/>:arrow_right: License Included;   
-<br/>si am descarcat wallet-ul pentru a-l folosi la conexiunea din mediul de dezvoltare SQL Developer, cu care lucram la curs si laborator. 
-<br/>In SQL Developer :arrow_right: New Connection => am setat Numele conexiunii, Database Type Oracle, la User Info: Username admin, Parola, la Connection Type: Cloud Wallet, la Configuration File am incarcat zip-ul cu wallet-ul.
+si am descarcat wallet-ul pentru a-l folosi la conexiunea din mediul de dezvoltare SQL Developer, cu care lucram la curs si laborator. 
+
+<br/>In SQL Developer -> New Connection => am setat Numele conexiunii, Database Type Oracle, la User Info: Username admin, Parola, la Connection Type: Cloud Wallet, la Configuration File am incarcat zip-ul cu wallet-ul.
+
 <br/>La reluarea lucrului in conexiune, daca apare eroarea "Listener refused the connextion with the following error: ORA-12514, TNS: listener does not currently know of service requested in connect descriptor", atunci baza de date autonoma trebuie repornita din Oracle Cloud, adica modificat state-ul din 'stopped' in 'start' -> https://docs.oracle.com/en/cloud/paas/autonomous-database/adbsa/autonomous-start.html#GUID-01A11B85-D5F7-49FB-95E6-BA77ACC33009 .
