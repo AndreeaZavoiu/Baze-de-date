@@ -1,8 +1,9 @@
 # Baze-de-date
 
-BD: Anul 1, Sem 2
+:heavy_check_mark: BD: Anul 1, Sem 2
 
-SGBD: Anul 2, Sem 1
+:heavy_check_mark: SGBD: Anul 2, Sem 1
+
 
 
 
